@@ -13,7 +13,7 @@ int syshal_lora_init(void)
 {
     // Power on device.
     syshal_gpio_init(SYSHAL_LORA_GPIO_POWER_ON);
-    syshal_gpio_set_output_high(SYSHAL_LORA_GPIO_POWER_ON);
+    syshal_gpio_set_output_low(SYSHAL_LORA_GPIO_POWER_ON);
 
     if (syshal_uart_change_baud(UART_LORA, UART_LORA_BAUDRATE) != SYSHAL_UART_NO_ERROR) {
         return SYSHAL_LORA_ERROR_UART;
@@ -30,10 +30,12 @@ int syshal_lora_init(void)
         return SYSHAL_LORA_ERROR_FRAME;
     }
 
+    syshal_gpio_set_output_high(SYSHAL_LORA_GPIO_POWER_ON);
     int err = syshal_uart_send(UART_LORA, frame, size);
     if (err != SYSHAL_UART_NO_ERROR) {
         return SYSHAL_LORA_ERROR_UART;
     }
+    syshal_gpio_set_output_low(SYSHAL_LORA_GPIO_POWER_ON);
 
     return SYSHAL_LORA_NO_ERROR;
 }
@@ -60,9 +62,11 @@ int syshal_lora_send_position(syshal_lora_position *position)
         return SYSHAL_LORA_ERROR_FRAME;
     }
 
+    syshal_gpio_set_output_high(SYSHAL_LORA_GPIO_POWER_ON);
     if (syshal_uart_send(UART_LORA, frame, size) != SYSHAL_UART_NO_ERROR) {
         return SYSHAL_LORA_ERROR_UART;
     }
+    syshal_gpio_set_output_low(SYSHAL_LORA_GPIO_POWER_ON);
 
     return SYSHAL_LORA_NO_ERROR;
 }
